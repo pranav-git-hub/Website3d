@@ -7,7 +7,58 @@
 
 </head>
 <body>
-  <script type="module" src="/src/main.js"></script>
+  <nav class="top-nav" aria-label="Primary">
+    <div class="top-nav__inner">
+      <a class="top-nav__brand" href="#scene">Website3d</a>
+      <div class="top-nav__links">
+        <a href="#scene">Model</a>
+        <a href="#home">Landing</a>
+        <a href="#about">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Existing app (DarkStar/plane) -->
+  <section id="scene" class="scene-section" aria-label="3D Model">
+    <div id="darkstar-container" class="canvas-host"></div>
+  </section>
+
+  <!-- Ported “landing” section: parallax background + falling astronaut -->
+  <section id="home" class="landing-section" aria-label="Landing">
+    <div class="landing-parallax" data-parallax-root>
+      <div class="parallax-layer parallax-sky" data-parallax-layer data-layer="sky"></div>
+      <div class="parallax-layer parallax-m3" data-parallax-layer data-layer="m3"></div>
+      <div class="parallax-layer parallax-planets" data-parallax-layer data-layer="planets"></div>
+      <div class="parallax-layer parallax-m2" data-parallax-layer data-layer="m2"></div>
+      <div class="parallax-layer parallax-m1" data-parallax-layer data-layer="m1"></div>
+    </div>
+
+    <div class="landing-content">
+      <p class="landing-kicker">Hi, I’m Ali</p>
+      <h1 class="landing-title">
+        A Developer dedicated to crafting
+        <span class="landing-flip" data-flip-words="Secure,Modern,Scalable">Secure</span>
+        web solutions
+      </h1>
+    </div>
+
+    <figure class="landing-astronaut">
+      <canvas id="astronaut-canvas"></canvas>
+    </figure>
+  </section>
+
+  <!-- Simple anchor so the “above About Me” parallax has somewhere to scroll into -->
+  <section id="about" class="about-section" aria-label="About">
+    <div class="about-inner">
+      <h2>About Me</h2>
+      <p>
+        This is a placeholder section so the landing parallax can scroll into something.
+        Replace this with your real About content when ready.
+      </p>
+    </div>
+  </section>
+
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
 

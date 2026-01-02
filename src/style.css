@@ -25,7 +25,8 @@ a:hover {
 body {
   margin: 0;
   background-color: #001C3C;
-  background-image: url('/assets/intro_bg.PNG');
+  /* set via JS so it respects Vite base (e.g. /Website3d/) */
+  background-image: var(--site-bg, none);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top;
@@ -88,6 +89,133 @@ button:focus-visible {
 
 canvas {
   display: block;
+}
+
+/* ---- Layout scaffolding (Model section + ported Landing section) ---- */
+.top-nav {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+.top-nav__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.top-nav__brand {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+}
+.top-nav__links {
+  display: flex;
+  gap: 14px;
+}
+.top-nav__links a {
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+}
+.top-nav__links a:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.scene-section,
+.landing-section {
+  min-height: 100vh;
+  position: relative;
+}
+.scene-section {
+  padding-top: 56px; /* keep content below fixed nav */
+}
+.canvas-host {
+  width: 100%;
+  height: calc(100vh - 56px);
+}
+
+/* ---- Landing (parallax + astronaut) ---- */
+.landing-section {
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.landing-parallax {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.40);
+}
+.parallax-layer {
+  position: absolute;
+  inset: 0;
+  background-position: bottom;
+  background-size: cover;
+  will-change: transform;
+}
+.landing-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  width: 100%;
+  padding: 90px 16px 24px;
+}
+.landing-kicker {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+.landing-title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: none;
+}
+.landing-flip {
+  display: inline-block;
+  margin: 0 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 900;
+}
+
+.landing-astronaut {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  z-index: 5;
+}
+#astronaut-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.about-section {
+  min-height: 80vh;
+  padding: 80px 16px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.about-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.about-inner h2 {
+  margin: 0 0 10px;
+  font-size: 32px;
+}
+.about-inner p {
+  margin: 0;
+  max-width: 70ch;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 
