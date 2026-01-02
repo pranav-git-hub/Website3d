@@ -1,11 +1,20 @@
 import * as THREE from 'three';
 
-export function createCamera(): THREE.PerspectiveCamera {
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+import { observeElementSize } from './observeElementSize';
+
+export function createCamera(container: HTMLElement): {
+  camera: THREE.PerspectiveCamera;
+  dispose: () => void;
+} {
+  const width = Math.max(1, container.clientWidth);
+  const height = Math.max(1, container.clientHeight);
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   camera.position.z = 5;
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+
+  const dispose = observeElementSize(container, (nextWidth, nextHeight) => {
+    camera.aspect = nextWidth / nextHeight;
     camera.updateProjectionMatrix();
   });
-  return camera;
+
+  return { camera, dispose };
 }
