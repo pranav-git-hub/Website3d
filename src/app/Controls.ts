@@ -48,6 +48,11 @@ export function createPointerRotationController(
   let targetPosX = 0;
   let targetPosY = 0;
 
+  // Remember last pointer position so we can recompute targets when the page scrolls.
+  let lastClientX = window.innerWidth / 2;
+  let lastClientY = window.innerHeight / 2;
+  let hasPointer = false;
+
   const ac = new AbortController();
 
   const calculateRotation = (clientX: number, clientY: number) => {
@@ -72,7 +77,30 @@ export function createPointerRotationController(
   // Pointer events cover mouse + touch + pen and are easier to clean up.
   element.addEventListener(
     'pointermove',
-    (event) => calculateRotation(event.clientX, event.clientY),
+    (event) => {
+      hasPointer = true;
+      lastClientX = event.clientX;
+      lastClientY = event.clientY;
+      calculateRotation(event.clientX, event.clientY);
+    },
+    { passive: true, signal: ac.signal }
+  );
+
+  // If the page scrolls, the element's bounding rect changes; recompute using the last pointer position.
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!hasPointer) return;
+      calculateRotation(lastClientX, lastClientY);
+    },
+    { passive: true, signal: ac.signal }
+  );
+  window.addEventListener(
+    'wheel',
+    () => {
+      if (!hasPointer) return;
+      calculateRotation(lastClientX, lastClientY);
+    },
     { passive: true, signal: ac.signal }
   );
 
