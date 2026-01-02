@@ -1,10 +1,4 @@
 import './style.css';
-import * as THREE from 'three';
-import { createCamera } from './app/Camera';
-import { createRenderer } from './app/Renderer';
-import { createLights } from './app/Lights';
-import { loadSuperHornet } from './models/SuperHornet';
-import { disposeObject3D } from './app/threeDispose';
 import { isMobile } from './utils/mobileCheck';
 import { initLandingParallax } from './landing/parallax';
 import { initFlipWords } from './landing/flipWords';
@@ -54,28 +48,7 @@ async function main() {
   // Used to automatically remove event listeners with { signal }.
   const abort = new AbortController();
 
-  // --- Existing DarkStar scene (now properly hosted inside its section) ---
-  const scene = new THREE.Scene();
-
   const disposers: Array<() => void> = [() => abort.abort()];
-
-  const { camera, dispose: disposeCamera } = createCamera(darkstarContainer);
-  disposers.push(disposeCamera);
-
-  const { renderer, dispose: disposeRenderer } = createRenderer(darkstarContainer);
-  disposers.push(disposeRenderer);
-  darkstarContainer.appendChild(renderer.domElement);
-
-  const lights = createLights();
-  lights.forEach((light) => scene.add(light));
-
-  const hornet = await loadSuperHornet({
-    scene,
-    container: darkstarContainer,
-    baseUrl: base,
-    useSmall: isMobile(),
-  });
-  if (hornet) disposers.push(hornet.dispose);
 
   // --- Ported landing: parallax + astronaut ---
   const landingRoot = document.querySelector<HTMLElement>('[data-parallax-root]');
@@ -94,31 +67,56 @@ async function main() {
 
   disposers.push(initFlipWords(document));
 
-  let raf = 0;
+  // Lazy-load the heavy three.js chunk so first paint is fast.
   let stopped = false;
+  let disposeDarkstar: null | (() => void) = null;
+  let loading = false;
 
-  const tick = () => {
-    raf = requestAnimationFrame(tick);
-    if (stopped || document.hidden) return;
-    hornet?.update();
-    renderer.render(scene, camera);
+  const loadDarkstar = async () => {
+    if (stopped || disposeDarkstar || loading) return;
+    loading = true;
+    try {
+      const { initDarkstar } = await import('./darkstar/initDarkstar');
+      disposeDarkstar = await initDarkstar(darkstarContainer, {
+        baseUrl: base,
+        isLowPower: isMobile(),
+      });
+      disposers.push(() => {
+        disposeDarkstar?.();
+        disposeDarkstar = null;
+      });
+    } catch (e) {
+      reportFatalError(e);
+    } finally {
+      loading = false;
+    }
   };
-  tick();
 
-  // Avoid burning GPU while the tab is hidden; render a fresh frame on resume.
-  document.addEventListener(
-    'visibilitychange',
-    () => {
-      if (!document.hidden && !stopped) renderer.render(scene, camera);
-    },
-    { signal: abort.signal }
-  );
+  // Start loading on idle (with a timeout), and also if the section is near view.
+  const startIdle = () => {
+    const ric = (window as unknown as { requestIdleCallback?: Function }).requestIdleCallback;
+    if (typeof ric === 'function') ric(() => loadDarkstar(), { timeout: 1500 });
+    else window.setTimeout(() => loadDarkstar(), 0);
+  };
+  startIdle();
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) loadDarkstar();
+      },
+      { root: null, threshold: 0.01, rootMargin: '400px 0px 400px 0px' }
+    );
+    io.observe(darkstarContainer);
+    disposers.push(() => io.disconnect());
+  } else {
+    loadDarkstar();
+  }
 
   const dispose = () => {
     if (stopped) return;
     stopped = true;
-
-    cancelAnimationFrame(raf);
 
     // Run custom disposers first (e.g. remove listeners, cancel RAFs)
     for (const d of disposers.splice(0).reverse()) {
@@ -128,10 +126,6 @@ async function main() {
         console.warn('Dispose failed:', e);
       }
     }
-
-    // Remove canvas + free GPU resources.
-    renderer.domElement.remove();
-    disposeObject3D(scene);
   };
 
   window.__disposeWebsite3d = dispose;

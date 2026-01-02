@@ -1,13 +1,22 @@
 import * as THREE from 'three';
 
 export type PointerRotationController = {
-  update: () => void;
+  /**
+   * Updates the model transform.
+   * @returns true if the model is still actively animating toward its target.
+   */
+  update: () => boolean;
   dispose: () => void;
 };
 
 export type PointerRotationOptions = {
   element: HTMLElement;
   model: THREE.Object3D;
+  /**
+   * Called when user input changes the target (e.g. pointermove/scroll),
+   * useful for "render on demand" loops.
+   */
+  onInput?: () => void;
   invertHorizontal?: boolean;
   rotateSpeedX?: number;
   rotateSpeedY?: number;
@@ -27,6 +36,7 @@ export function createPointerRotationController(
   const {
     element,
     model,
+    onInput,
     invertHorizontal = true,
     rotateSpeedX = 0.05,
     rotateSpeedY = 0.05,
@@ -74,6 +84,14 @@ export function createPointerRotationController(
     }
   };
 
+  const notifyInput = () => {
+    try {
+      onInput?.();
+    } catch {
+      // ignore
+    }
+  };
+
   // Pointer events cover mouse + touch + pen and are easier to clean up.
   element.addEventListener(
     'pointermove',
@@ -82,6 +100,7 @@ export function createPointerRotationController(
       lastClientX = event.clientX;
       lastClientY = event.clientY;
       calculateRotation(event.clientX, event.clientY);
+      notifyInput();
     },
     { passive: true, signal: ac.signal }
   );
@@ -92,6 +111,7 @@ export function createPointerRotationController(
     () => {
       if (!hasPointer) return;
       calculateRotation(lastClientX, lastClientY);
+      notifyInput();
     },
     { passive: true, signal: ac.signal }
   );
@@ -100,6 +120,7 @@ export function createPointerRotationController(
     () => {
       if (!hasPointer) return;
       calculateRotation(lastClientX, lastClientY);
+      notifyInput();
     },
     { passive: true, signal: ac.signal }
   );
@@ -117,6 +138,18 @@ export function createPointerRotationController(
       model.position.x += (targetPosX - model.position.x) * leanLerpSpeed;
       model.position.y += (targetPosY - model.position.y) * leanLerpSpeed;
     }
+
+    // Consider it "still animating" while we're meaningfully far from target.
+    const epsRot = 1e-4;
+    const epsPos = 1e-4;
+    const rotActive =
+      Math.abs(targetRotationX - model.rotation.x) > epsRot ||
+      Math.abs(targetRotationY - model.rotation.y) > epsRot;
+    const posActive = enableLean
+      ? Math.abs(targetPosX - model.position.x) > epsPos ||
+        Math.abs(targetPosY - model.position.y) > epsPos
+      : false;
+    return rotActive || posActive;
   };
 
   const dispose = () => ac.abort();
