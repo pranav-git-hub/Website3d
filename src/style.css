@@ -13,6 +13,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap");
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -31,6 +33,10 @@ body {
   background-size: cover;
   background-position: top;
   background-attachment: fixed;
+  font-family: "Funnel Display", system-ui, sans-serif;
+  color: white;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -125,17 +131,18 @@ canvas {
   color: rgba(255, 255, 255, 0.95);
 }
 
-.scene-section,
 .landing-section {
   min-height: 100vh;
   position: relative;
 }
-.scene-section {
-  padding-top: 56px; /* keep content below fixed nav */
-}
 .canvas-host {
   width: 100%;
-  height: calc(100vh - 56px);
+  height: 100vh;
+}
+.canvas-host--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 15; /* in front of parallax */
 }
 
 /* ---- Landing (parallax + astronaut) ---- */
@@ -158,45 +165,119 @@ canvas {
 }
 .landing-content {
   position: relative;
-  z-index: 10;
+  z-index: 30; /* above the model canvas, like the original portfolio */
   max-width: 1100px;
   width: 100%;
   padding: 90px 16px 24px;
-}
-.landing-kicker {
-  margin: 0 0 10px;
-  font-size: 18px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-}
-.landing-title {
-  margin: 0;
-  font-size: clamp(28px, 4vw, 56px);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.95);
-  text-transform: none;
-}
-.landing-flip {
-  display: inline-block;
-  margin: 0 10px;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-weight: 900;
+  pointer-events: none; /* let model interaction pass through */
 }
 
-.landing-astronaut {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  z-index: 5;
+/* ---- Hero text (ported from portfolio HeroText.jsx tailwind intent) ---- */
+.hero {
+  max-width: 60rem;
 }
-#astronaut-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
+.hero-hi {
+  margin: 0 0 12px;
+  font-size: 2.25rem; /* ~text-4xl */
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.hero-line {
+  margin: 0;
+  font-size: 3rem; /* ~text-5xl */
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75); /* neutral-300-ish */
+  line-height: 1.1;
+}
+.hero-flip {
+  margin-top: 10px;
+}
+.hero-sub {
+  margin: 12px 0 0;
+  font-size: 2.25rem; /* ~text-4xl */
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- FlipWords (ported from portfolio FlipWords.jsx animation intent) ---- */
+.landing-flip {
+  display: inline-block;
+  position: relative;
+  text-align: left;
+  font-weight: 900;
+  font-size: clamp(3rem, 7vw, 6rem); /* ~text-8xl */
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.98);
+  white-space: nowrap;
+  will-change: transform, filter, opacity;
+}
+.flipword-word {
+  display: inline-block;
+}
+.flipword-word.is-entering {
+  animation: flipword-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.flipword-word.is-exiting {
+  position: absolute;
+  inset: 0 auto auto 0;
+  animation: flipword-exit 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.flipword-letter {
+  display: inline-block;
+  will-change: transform, filter, opacity;
+  animation: flipword-letter 220ms ease-out both;
+}
+
+@keyframes flipword-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+@keyframes flipword-exit {
+  to {
+    opacity: 0;
+    transform: translate(40px, -40px) scale(2);
+    filter: blur(8px);
+  }
+}
+@keyframes flipword-letter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+    filter: blur(0px);
+  }
+}
+
+@media (max-width: 853px) {
+  .landing-content {
+    padding-top: 76px;
+    text-align: center;
+  }
+  .hero-hi {
+    font-size: 2rem;
+  }
+  .hero-line {
+    font-size: 2.75rem;
+    font-weight: 800;
+  }
+  .hero-sub {
+    font-size: 2rem;
+    font-weight: 800;
+  }
+}
+
+.landing-section canvas {
+  pointer-events: auto;
 }
 
 .about-section {

@@ -9,21 +9,15 @@
 <body>
   <nav class="top-nav" aria-label="Primary">
     <div class="top-nav__inner">
-      <a class="top-nav__brand" href="#scene">Website3d</a>
+      <a class="top-nav__brand" href="#home">Website3d</a>
       <div class="top-nav__links">
-        <a href="#scene">Model</a>
-        <a href="#home">Landing</a>
+        <a href="#home">Home</a>
         <a href="#about">About</a>
       </div>
     </div>
   </nav>
 
-  <!-- Existing app (DarkStar/plane) -->
-  <section id="scene" class="scene-section" aria-label="3D Model">
-    <div id="darkstar-container" class="canvas-host"></div>
-  </section>
-
-  <!-- Ported “landing” section: parallax background + falling astronaut -->
+  <!-- Landing at top: parallax background with the DarkStar/plane rendered in front -->
   <section id="home" class="landing-section" aria-label="Landing">
     <div class="landing-parallax" data-parallax-root>
       <div class="parallax-layer parallax-sky" data-parallax-layer data-layer="sky"></div>
@@ -33,18 +27,26 @@
       <div class="parallax-layer parallax-m1" data-parallax-layer data-layer="m1"></div>
     </div>
 
-    <div class="landing-content">
-      <p class="landing-kicker">Hi, I’m Ali</p>
-      <h1 class="landing-title">
-        A Developer dedicated to crafting
-        <span class="landing-flip" data-flip-words="Secure,Modern,Scalable">Secure</span>
-        web solutions
-      </h1>
-    </div>
+    <!-- DarkStar canvas overlay (front) -->
+    <div id="darkstar-container" class="canvas-host canvas-host--overlay" aria-label="3D Model"></div>
 
-    <figure class="landing-astronaut">
-      <canvas id="astronaut-canvas"></canvas>
-    </figure>
+    <div class="landing-content">
+      <div class="hero">
+        <h1 class="hero-hi">Hi I'm Pro</h1>
+        <p class="hero-line">
+          A Developer <br />
+          Dedicated to Crafting
+        </p>
+        <div class="hero-flip">
+          <span
+            class="landing-flip"
+            data-flip-words="Secure,Modern,Scalable"
+            data-flip-duration="3000"
+          >Secure</span>
+        </div>
+        <p class="hero-sub">Web Solutions</p>
+      </div>
+    </div>
   </section>
 
   <!-- Simple anchor so the “above About Me” parallax has somewhere to scroll into -->
