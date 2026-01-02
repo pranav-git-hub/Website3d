@@ -1,24 +1,20 @@
 import * as THREE from 'three';
 
-function getSize(el: HTMLElement) {
-  return {
-    width: Math.max(1, el.clientWidth),
-    height: Math.max(1, el.clientHeight),
-  };
-}
+import { observeElementSize } from './observeElementSize';
 
-export function createCamera(container: HTMLElement): THREE.PerspectiveCamera {
-  const { width, height } = getSize(container);
+export function createCamera(container: HTMLElement): {
+  camera: THREE.PerspectiveCamera;
+  dispose: () => void;
+} {
+  const width = Math.max(1, container.clientWidth);
+  const height = Math.max(1, container.clientHeight);
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   camera.position.z = 5;
 
-  const ro = new ResizeObserver(() => {
-    const next = getSize(container);
-    camera.aspect = next.width / next.height;
+  const dispose = observeElementSize(container, (nextWidth, nextHeight) => {
+    camera.aspect = nextWidth / nextHeight;
     camera.updateProjectionMatrix();
   });
-  ro.observe(container);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (camera as any).__resizeObserver = ro;
-  return camera;
+
+  return { camera, dispose };
 }

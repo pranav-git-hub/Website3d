@@ -1,26 +1,30 @@
 import * as THREE from 'three';
 
-function getSize(el: HTMLElement) {
-  return {
-    width: Math.max(1, el.clientWidth),
-    height: Math.max(1, el.clientHeight),
-  };
-}
+import { observeElementSize } from './observeElementSize';
 
-export function createRenderer(container: HTMLElement): THREE.WebGLRenderer {
+export function createRenderer(container: HTMLElement): {
+  renderer: THREE.WebGLRenderer;
+  dispose: () => void;
+} {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  const { width, height } = getSize(container);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(width, height, false);
+  renderer.setSize(
+    Math.max(1, container.clientWidth),
+    Math.max(1, container.clientHeight),
+    false
+  );
 
-  const ro = new ResizeObserver(() => {
-    const next = getSize(container);
-    renderer.setSize(next.width, next.height, false);
+  const disposeObserver = observeElementSize(container, (width, height) => {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height, false);
   });
-  ro.observe(container);
 
-  // Expose a tiny hook so callers can clean up if needed.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (renderer as any).__resizeObserver = ro;
-  return renderer;
+  const dispose = () => {
+    disposeObserver();
+    renderer.dispose();
+  };
+
+  return { renderer, dispose };
 }
