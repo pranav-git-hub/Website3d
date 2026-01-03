@@ -33,7 +33,7 @@ type PointerRotationOptions = {
 };
 
 /**
- * Port of the original controller from `src/app/Controls.ts`, adapted for R3F.
+ * Pointer-driven rotation controller, adapted for R3F.
  * Keeps: clamped rotations, smoothing, desktop lean, scroll/wheel recompute, onInput hook.
  */
 function createPointerRotationController(opts: PointerRotationOptions): PointerRotationController {
@@ -91,7 +91,9 @@ function createPointerRotationController(opts: PointerRotationOptions): PointerR
   const notifyInput = () => {
     try {
       onInput?.();
-    } catch {}
+    } catch {
+      // Intentionally ignore input callback errors to keep the render loop stable.
+    }
   };
 
   element.addEventListener(
@@ -219,7 +221,11 @@ export function DarkstarCanvas() {
     };
 
     // Start loading on idle (with a timeout) to keep first paint fast.
-    const ric = (window as unknown as { requestIdleCallback?: Function }).requestIdleCallback;
+    const ric = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
     if (typeof ric === 'function') ric(() => load(), { timeout: 1500 });
     else window.setTimeout(() => load(), 0);
 
@@ -265,9 +271,4 @@ export function DarkstarCanvas() {
     </div>
   );
 }
-
-// Optional preload (won't fetch until module is evaluated; safe to keep here)
-useGLTF.preload(`${import.meta.env.BASE_URL || '/'}assets/DarkStarSmall.glb`);
-useGLTF.preload(`${import.meta.env.BASE_URL || '/'}assets/DarkStar.glb`);
-
-
+// Note: avoid module-scope `useGLTF.preload(...)` here; it defeats our idle/viewport lazy-load.

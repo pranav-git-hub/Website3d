@@ -17,6 +17,8 @@ export function initFlipWords(root: ParentNode) {
   let currentWord = words[0];
   let isAnimating = false;
   let timeout = 0;
+  let exitTimeout = 0;
+  let disposed = false;
 
   const buildWordNode = (text: string) => {
     const node = document.createElement('span');
@@ -51,6 +53,7 @@ export function initFlipWords(root: ParentNode) {
   };
 
   const startAnimation = () => {
+    if (disposed) return;
     if (isAnimating) return;
     isAnimating = true;
 
@@ -67,7 +70,8 @@ export function initFlipWords(root: ParentNode) {
     el.appendChild(entering);
 
     // remove old after exit completes
-    window.setTimeout(() => {
+    exitTimeout = window.setTimeout(() => {
+      if (disposed) return;
       exiting?.remove();
       isAnimating = false;
       schedule();
@@ -83,7 +87,11 @@ export function initFlipWords(root: ParentNode) {
 
   renderInitial();
   schedule();
-  return () => window.clearTimeout(timeout);
+  return () => {
+    disposed = true;
+    window.clearTimeout(timeout);
+    window.clearTimeout(exitTimeout);
+  };
 }
 
 

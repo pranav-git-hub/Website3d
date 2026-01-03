@@ -3,11 +3,11 @@
 ## High-level architecture
 
 - **Build tool**: Vite (`vite.config.mjs` sets `base` for GitHub Pages; can be overridden by `VITE_BASE`).
-- **Runtime**: Vanilla TypeScript modules, no framework.
-- **Rendering**: Three.js scene rendered into `#darkstar-container` inside the landing section.
+- **Runtime**: React + TypeScript (Vite) with React Router for routing.
+- **Rendering (3D)**: React Three Fiber (R3F) `<Canvas>` mounted inside `#darkstar-container` within the landing section.
 - **Landing UI effects**:
-  - Parallax: DOM layers transformed with a spring-smoothed scroll progress.
-  - Flip words: DOM text replaced/animated on a timer.
+  - Parallax: DOM layers transformed with a spring-smoothed scroll progress (bridged from React via `useEffect`).
+  - Flip words: DOM text replaced/animated on a timer (bridged from React via `useEffect`).
 - **Tooling**: ESLint (`eslint.config.mjs`) + Prettier (`.prettierrc.json`).
 
 ## Directory tree (source-of-truth)
@@ -25,22 +25,20 @@ Website3d/
     FILE_MAP.md
     STRUCTURE.md
   src/
-    main.ts
+    main.tsx
+    App.tsx
+    pages/
+      Home.tsx
+    components/
+      TopNav.tsx
+      Landing.tsx
+      About.tsx
+      DarkstarCanvas.tsx
     style.css
     vite-env.d.ts
-    typescript.svg
-    app/
-      Camera.ts
-      Controls.ts
-      Lights.ts
-      observeElementSize.ts
-      Renderer.ts
-      threeDispose.ts
     landing/
       parallax.ts
       flipWords.ts
-    models/
-      SuperHornet.ts
     utils/
       mobileCheck.ts
   public/
@@ -53,9 +51,6 @@ Website3d/
       mountain-1.png
       mountain-2.png
       mountain-3.png
-    models/
-      astronaut.glb
-    vite.svg
   dist/               (generated)
   node_modules/       (generated)
 ```
@@ -67,29 +62,42 @@ Notes:
 
 ## Runtime flow (what runs on page load)
 
-1. **`index.html` loads `src/main.ts`**
-   - Also defines the DOM elements the effects attach to:
-     - `#darkstar-container` for the Three.js canvas.
-     - `[data-parallax-root]` and `[data-parallax-layer]` for parallax layers.
-     - `[data-flip-words]` for the flip-words headline.
+1. **`index.html` loads `src/main.tsx`**
+   - `index.html` now only provides `#root` for React to mount.
 
-2. **`src/main.ts` bootstraps everything**
+2. **`src/main.tsx` mounts the React app**
+   - Mounts `<App />` into `#root`.
+
+3. **`src/App.tsx` sets up routing**
+   - Uses React Router (`BrowserRouter`) with `basename={import.meta.env.BASE_URL}` for GitHub Pages base paths.
+   - Current route table renders the `HomePage`.
+
+4. **`src/pages/Home.tsx` renders the page**
    - Sets `--site-bg` using `import.meta.env.BASE_URL` so `intro_bg.PNG` resolves under a non-root base (GitHub Pages).
-   - Creates a Three.js `scene`, `camera`, `renderer`.
-   - Adds lights from `createLights()`.
-   - Loads the DarkStar model via `loadSuperHornet({ scene, container, baseUrl, useSmall })`.
-   - Starts landing effects:
+   - Renders:
+     - `TopNav` (fixed top navigation)
+     - `Landing` (parallax layers + hero + `#darkstar-container`)
+     - `About` section
+
+5. **`src/components/Landing.tsx` bootstraps landing effects + 3D**
+   - Initializes:
      - `initLandingParallax(...)` (scroll + RAF driven)
      - `initFlipWords(...)` (timer driven)
-   - Starts the main RAF loop:
-     - calls `hornet?.update()` each frame (updates model rotation/lean)
-     - calls `renderer.render(scene, camera)`
-   - Registers a `dispose()` function as `window.__disposeWebsite3d` to stop RAF, remove listeners, remove the canvas, and dispose scene GPU resources.
+   - Mounts the R3F canvas via `DarkstarCanvas` inside `#darkstar-container`.
+
+6. **`src/components/DarkstarCanvas.tsx` renders the DarkStar scene (R3F)**
+   - Lazy-loads the model when idle / near viewport.
+   - Loads `public/assets/DarkStar.glb` (or `DarkStarSmall.glb` on low-power/mobile).
+   - Uses a ported pointer rotation controller (from the old imperative version) to provide:
+     - smoothing + clamped rotations
+     - optional “lean” on fine pointers
+     - scroll/wheel target recompute
+   - Uses `frameloop="demand"` and invalidates while animating/input changes to reduce idle GPU usage.
 
 3. **Per-module responsibilities**
-   - **`src/app/*`**: low-level Three.js setup (renderer/camera/lights) and input-driven model updates (`Controls.ts`).
-   - **`src/models/SuperHornet.ts`**: loads the GLB and returns an update function connected to input.
-   - **`src/landing/parallax.ts`**: DOM parallax effect (scroll listeners + RAF updates).
-   - **`src/landing/flipWords.ts`**: DOM text swap/animation (setTimeout loop).
+   - **`src/components/*`**: React UI and layout.
+   - **`src/components/DarkstarCanvas.tsx`**: R3F 3D scene + model loading + pointer-driven motion.
+   - **`src/landing/*`**: DOM effects used by `Landing` (`parallax.ts`, `flipWords.ts`).
+   - Legacy imperative Three.js modules were removed to keep the repo minimal.
 
 
