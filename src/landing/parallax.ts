@@ -54,9 +54,6 @@ function mapRange(
 }
 
 export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
-  const reduceMotion =
-    window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
-
   const layerEls = Array.from(
     root.querySelectorAll<HTMLElement>('[data-parallax-layer]')
   );
@@ -113,28 +110,9 @@ export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
     }
   };
 
-  let visible = true;
   let raf = 0;
-  let running = false;
   let last = performance.now();
-
-  const stop = () => {
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0;
-    running = false;
-  };
-
-  const maybeStart = () => {
-    if (reduceMotion) return;
-    if (!visible) return;
-    if (running) return;
-    running = true;
-    last = performance.now();
-    raf = requestAnimationFrame(tick);
-  };
-
-  function tick() {
-    if (!running) return;
+  const tick = () => {
     raf = requestAnimationFrame(tick);
 
     const now = performance.now();
@@ -144,56 +122,21 @@ export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
     // Smooth the scroll progress using the same spring approach as motion/react.
     const x = springStep(spring, target.progress, dt, springCfg);
     applyTransforms(x);
-
-    // If we're effectively settled, stop the RAF to avoid burning CPU/GPU.
-    const settled =
-      Math.abs(spring.v) < 1e-4 && Math.abs(spring.x - target.progress) < 1e-4;
-    if (settled) stop();
-  }
+  };
 
   const onScroll = () => {
     recomputeTargets();
-    if (reduceMotion) {
-      // Jump immediately (no animation) for accessibility.
-      spring.x = target.progress;
-      spring.v = 0;
-      applyTransforms(spring.x);
-      return;
-    }
-    maybeStart();
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   recomputeTargets();
-  applyTransforms(spring.x);
-
-  // Only animate while the parallax section is near the viewport.
-  let io: IntersectionObserver | null = null;
-  if (typeof IntersectionObserver !== 'undefined') {
-    io = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        visible = Boolean(entry?.isIntersecting);
-        if (visible) {
-          recomputeTargets();
-          maybeStart();
-        } else {
-          stop();
-        }
-      },
-      { root: null, threshold: 0.01, rootMargin: '200px 0px 200px 0px' }
-    );
-    io.observe(root);
-  }
-
-  if (!reduceMotion) maybeStart();
+  tick();
 
   return () => {
-    stop();
+    cancelAnimationFrame(raf);
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onScroll);
-    io?.disconnect();
   };
 }
 
