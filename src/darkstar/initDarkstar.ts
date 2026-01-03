@@ -55,7 +55,7 @@ export async function initDarkstar(container: HTMLElement, opts: InitDarkstarOpt
   const lights = createLights();
   lights.forEach((light) => scene.add(light));
 
-  const tick = (now: number) => {
+  function tick(now: number) {
     if (!running) return;
     if (stopped || document.hidden || !inView) {
       running = false;
@@ -74,7 +74,7 @@ export async function initDarkstar(container: HTMLElement, opts: InitDarkstarOpt
 
     if (animating) raf = requestAnimationFrame(tick);
     else running = false;
-  };
+  }
 
   // Only animate while the canvas section is near the viewport.
   let io: IntersectionObserver | null = null;
@@ -134,5 +134,7 @@ export async function initDarkstar(container: HTMLElement, opts: InitDarkstarOpt
     disposeObject3D(scene);
   };
 }
+
+
 
 

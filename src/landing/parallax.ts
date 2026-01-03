@@ -133,7 +133,7 @@ export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
     raf = requestAnimationFrame(tick);
   };
 
-  const tick = () => {
+  function tick() {
     if (!running) return;
     raf = requestAnimationFrame(tick);
 
@@ -149,7 +149,7 @@ export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
     const settled =
       Math.abs(spring.v) < 1e-4 && Math.abs(spring.x - target.progress) < 1e-4;
     if (settled) stop();
-  };
+  }
 
   const onScroll = () => {
     recomputeTargets();
