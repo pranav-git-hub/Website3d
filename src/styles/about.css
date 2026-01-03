@@ -1,0 +1,20 @@
+.about-section {
+  min-height: 80vh;
+  padding: 80px 16px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.about-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.about-inner h2 {
+  margin: 0 0 10px;
+  font-size: 32px;
+}
+.about-inner p {
+  margin: 0;
+  max-width: 70ch;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+

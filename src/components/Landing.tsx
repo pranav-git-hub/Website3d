@@ -74,16 +74,15 @@ export function Landing() {
         <div className="hero">
           <h1 className="hero-hi">Pranav Arvind Bhile</h1>
           <p className="hero-line">
-          Worked with Fortune 500 teams
+          B.E. in Computer Science, BITS Pilani
           <br />
           MIT-published researcher
           <br />
-          B.E. in Computer Science, BITS Pilani
+          Worked with Fortune 500 teams
           <br />
-            
           </p>
           <div className="hero-flip">
-            <span className="landing-flip" data-flip-words="ML / AI, Gen AI" data-flip-duration="3000">
+            <span className="landing-flip" data-flip-words="AI / ML, Gen AI" data-flip-duration="3000">
               Secure
             </span>
           </div>

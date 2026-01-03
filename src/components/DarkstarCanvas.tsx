@@ -59,8 +59,11 @@ function createPointerRotationController(opts: PointerRotationOptions): PointerR
   let targetRotationX = 0;
   let targetRotationY = Math.PI;
 
-  let targetPosX = 0;
-  let targetPosY = 0;
+  // Keep pointer "lean" relative to the model's initial placement (so we can offset spawn position).
+  const basePosX = model.position.x;
+  const basePosY = model.position.y;
+  let targetPosX = basePosX;
+  let targetPosY = basePosY;
 
   // Remember last pointer position so we can recompute targets when the page scrolls.
   let lastClientX = window.innerWidth / 2;
@@ -83,8 +86,8 @@ function createPointerRotationController(opts: PointerRotationOptions): PointerR
     targetRotationX = -normalizedY * Math.PI;
 
     if (enableLean) {
-      targetPosX = normalizedX * maxLeanX;
-      targetPosY = -normalizedY * maxLeanY;
+      targetPosX = basePosX + normalizedX * maxLeanX;
+      targetPosY = basePosY + -normalizedY * maxLeanY;
     }
   };
 
@@ -195,7 +198,8 @@ function DarkstarModel({ url, isLowPower }: DarkstarModelProps) {
   });
 
   return (
-    <group ref={root}>
+    // Move the model spawn point down a bit so it sits lower in the hero.
+    <group ref={root} position={[0, -0.65, 0]}>
       <primitive object={gltf.scene} scale={0.5} />
     </group>
   );
