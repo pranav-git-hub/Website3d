@@ -69,38 +69,175 @@ canvas {
   display: block;
 }
 
-/* ---- Layout scaffolding (model + landing sections) ---- */
-.top-nav {
+/* ---- Floating dock navbar (top) ---- */
+.floating-dock-desktop {
   position: fixed;
-  inset-inline: 0;
-  top: 0;
-  z-index: 50;
+  left: 50%;
+  top: 14px;
+  transform: translateX(-50%);
+  z-index: 80;
+  height: 64px;
+  display: none; /* enabled at md+ */
+  align-items: flex-end;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 18px;
   background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
-.top-nav__inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 10px 16px;
+
+.floating-dock-desktop__link {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.92);
+}
+.floating-dock-desktop__link:hover {
+  color: rgba(255, 255, 255, 1);
+}
+.floating-dock-desktop__link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.floating-dock-desktop__icon {
+  position: relative;
   display: flex;
+  aspect-ratio: 1 / 1;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background-color 120ms ease, border-color 120ms ease;
 }
-.top-nav__brand {
-  color: rgba(255, 255, 255, 0.85);
+.floating-dock-desktop__icon:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.floating-dock-desktop__iconInner {
+  display: grid;
+  place-items: center;
+}
+.floating-dock-desktop__iconInner svg {
+  width: 100%;
+  height: 100%;
+}
+
+.floating-dock-desktop__tooltip {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 10px);
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.floating-dock-mobile {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 90;
+  display: block;
+}
+
+.floating-dock-mobile__toggle {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+}
+.floating-dock-mobile__toggle:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+.floating-dock-mobile__toggle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+}
+.floating-dock-mobile__toggleIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.floating-dock-mobile__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.40);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.42);
+  min-width: 160px;
+}
+
+.floating-dock-mobile__item {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 10px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 700;
 }
-.top-nav__links {
-  display: flex;
-  gap: 14px;
+.floating-dock-mobile__item:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 1);
 }
-.top-nav__links a {
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 600;
+.floating-dock-mobile__itemIcon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
 }
-.top-nav__links a:hover {
-  color: rgba(255, 255, 255, 0.95);
+.floating-dock-mobile__itemIcon svg {
+  width: 100%;
+  height: 100%;
+}
+.floating-dock-mobile__itemLabel {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .floating-dock-desktop {
+    display: flex;
+  }
+  .floating-dock-mobile {
+    display: none;
+  }
+}
+
+/* Prevent anchored sections from being hidden behind the fixed dock */
+#home,
+#about {
+  scroll-margin-top: 96px;
 }
 
 .landing-section {
