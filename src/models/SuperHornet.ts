@@ -8,6 +8,7 @@ type LoadSuperHornetOptions = {
   container: HTMLElement;
   baseUrl: string;
   useSmall: boolean;
+  onInput?: () => void;
 };
 
 function resolveAssetUrl(baseUrl: string, path: string) {
@@ -18,7 +19,10 @@ function resolveAssetUrl(baseUrl: string, path: string) {
 
 export async function loadSuperHornet(
   opts: LoadSuperHornetOptions
-): Promise<{ model: THREE.Object3D; update: () => void; dispose: () => void } | null> {
+): Promise<
+  | { model: THREE.Object3D; update: () => boolean; dispose: () => void }
+  | null
+> {
   const loader = new GLTFLoader();
   const modelPath = resolveAssetUrl(
     opts.baseUrl,
@@ -36,6 +40,7 @@ export async function loadSuperHornet(
         const controller = createPointerRotationController({
           element: opts.container,
           model,
+          onInput: opts.onInput,
         });
 
         const dispose = () => {

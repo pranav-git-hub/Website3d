@@ -2,14 +2,30 @@ import * as THREE from 'three';
 
 import { observeElementSize } from './observeElementSize';
 
-export function createRenderer(container: HTMLElement): {
+export type CreateRendererOptions = {
+  maxDpr?: number;
+  antialias?: boolean;
+  onResize?: () => void;
+};
+
+export function createRenderer(
+  container: HTMLElement,
+  opts: CreateRendererOptions = {}
+): {
   renderer: THREE.WebGLRenderer;
   dispose: () => void;
 } {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  const { maxDpr = 2, antialias = true, onResize } = opts;
+
+  const renderer = new THREE.WebGLRenderer({
+    antialias,
+    alpha: true,
+    powerPreference: 'high-performance',
+  });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  let lastDpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+  renderer.setPixelRatio(lastDpr);
   renderer.setSize(
     Math.max(1, container.clientWidth),
     Math.max(1, container.clientHeight),
@@ -17,8 +33,13 @@ export function createRenderer(container: HTMLElement): {
   );
 
   const disposeObserver = observeElementSize(container, (width, height) => {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const nextDpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    if (nextDpr !== lastDpr) {
+      lastDpr = nextDpr;
+      renderer.setPixelRatio(nextDpr);
+    }
     renderer.setSize(width, height, false);
+    onResize?.();
   });
 
   const dispose = () => {
