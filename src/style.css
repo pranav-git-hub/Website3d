@@ -199,6 +199,40 @@ canvas {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.hero-socials {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto; /* landing-content is pointer-events:none; keep only links clickable */
+}
+.hero-socials__link {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.hero-socials__link:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 1);
+}
+.hero-socials__link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+.hero-socials__icon {
+  width: 20px;
+  height: 20px;
+}
+
 /* ---- FlipWords (ported from portfolio FlipWords.jsx animation intent) ---- */
 .landing-flip {
   display: inline-block;
@@ -273,6 +307,9 @@ canvas {
   .hero-sub {
     font-size: 2rem;
     font-weight: 800;
+  }
+  .hero-socials {
+    justify-content: center;
   }
 }
 
