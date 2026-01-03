@@ -97,7 +97,7 @@ canvas {
   display: block;
 }
 
-/* ---- Layout scaffolding (Model section + ported Landing section) ---- */
+/* ---- Layout scaffolding (model + landing sections) ---- */
 .top-nav {
   position: fixed;
   inset-inline: 0;
@@ -165,14 +165,14 @@ canvas {
 }
 .landing-content {
   position: relative;
-  z-index: 30; /* above the model canvas, like the original portfolio */
+  z-index: 30; /* above the model canvas */
   max-width: 1100px;
   width: 100%;
   padding: 90px 16px 24px;
   pointer-events: none; /* let model interaction pass through */
 }
 
-/* ---- Hero text (ported from portfolio HeroText.jsx tailwind intent) ---- */
+/* ---- Hero text ---- */
 .hero {
   max-width: 60rem;
 }
@@ -233,7 +233,7 @@ canvas {
   height: 20px;
 }
 
-/* ---- FlipWords (ported from portfolio FlipWords.jsx animation intent) ---- */
+/* ---- FlipWords ---- */
 .landing-flip {
   display: inline-block;
   position: relative;

@@ -11,13 +11,8 @@ function clamp01(n: number) {
 }
 
 /**
- * This is the “exact” damping concept from the portfolio:
- *   const x = useSpring(scrollYProgress, { damping: 50 })
- *
- * motion/react (Framer Motion) uses a 2nd-order spring:
- *   x'' = -(k/m)(x - target) - (c/m)x'
- *
- * We replicate that here so the scroll smoothing feels like the original.
+ * Smooth scroll progress with a 2nd-order spring (similar to Framer Motion's `useSpring`).
+ * This reduces jitter while keeping the parallax response snappy.
  */
 type SpringConfig = {
   stiffness: number; // k
@@ -66,8 +61,7 @@ export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
     if (src) el.style.backgroundImage = `url("${src}")`;
   }
 
-  // Portfolio uses scrollYProgress (0..1) + useSpring(damping: 50).
-  // useSpring defaults: stiffness ~ 100, mass ~ 1 (Framer Motion defaults).
+  // Parameters tuned for a UI-like spring feel.
   const springCfg: SpringConfig = { stiffness: 100, damping: 50, mass: 1 };
   const spring = { x: 0, v: 0 }; // smoothed progress + velocity
 
@@ -83,7 +77,7 @@ export function initLandingParallax(root: HTMLElement, assets: ParallaxAssets) {
     const vh = Math.max(1, window.innerHeight);
     const vw = Math.max(1, window.innerWidth);
 
-    // Mirror the portfolio mappings (only active for first ~half scroll)
+    // Parallax mappings (only active for the first ~half of the scroll range).
     const m3Y = mapRange(x, 0, 0.5, 0, 0.7 * vh);
     const planetsX = mapRange(x, 0, 0.5, 0, -0.2 * vw);
     const m2Y = mapRange(x, 0, 0.5, 0, 0.3 * vh);

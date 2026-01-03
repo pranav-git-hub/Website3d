@@ -87,9 +87,7 @@ export function createPointerRotationController(
   const notifyInput = () => {
     try {
       onInput?.();
-    } catch {
-      // ignore
-    }
+    } catch {}
   };
 
   // Pointer events cover mouse + touch + pen and are easier to clean up.
@@ -126,14 +124,14 @@ export function createPointerRotationController(
   );
 
   const update = () => {
-    // 🔁 Smooth rotation
+    // Smooth rotation.
     const nextY = model.rotation.y + (targetRotationY - model.rotation.y) * rotateSpeedY;
     model.rotation.y = THREE.MathUtils.clamp(nextY, minRotationY, maxRotationY);
 
     const nextX = model.rotation.x + (targetRotationX - model.rotation.x) * rotateSpeedX;
     model.rotation.x = THREE.MathUtils.clamp(nextX, minRotationX, maxRotationX);
 
-    // 🪄 Smooth lean effect for desktop only
+    // Smooth lean effect (primarily for desktop/fine pointers).
     if (enableLean) {
       model.position.x += (targetPosX - model.position.x) * leanLerpSpeed;
       model.position.y += (targetPosY - model.position.y) * leanLerpSpeed;

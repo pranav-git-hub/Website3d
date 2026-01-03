@@ -22,7 +22,7 @@ export function initFlipWords(root: ParentNode) {
     const node = document.createElement('span');
     node.className = 'flipword-word is-entering';
 
-    // Split by spaces first (portfolio supports multi-word)
+    // Support multi-word phrases by splitting on spaces first.
     const parts = text.split(' ');
     parts.forEach((part, wordIndex) => {
       // Each “word”

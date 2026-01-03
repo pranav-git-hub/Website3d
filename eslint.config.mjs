@@ -17,7 +17,7 @@ export default [
   prettier,
   {
     rules: {
-      // This is a demo/portfolio style app; console logging is acceptable.
+      // Console logging is used for runtime error reporting/debugging in this app.
       'no-console': 'off',
     },
   },
