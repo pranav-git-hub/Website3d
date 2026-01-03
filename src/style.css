@@ -69,24 +69,25 @@ canvas {
   display: block;
 }
 
-/* ---- Floating dock navbar (top) ---- */
+/* ---- Floating dock navbar (bottom; appears after 25% hero scroll) ---- */
 .floating-dock-desktop {
   position: fixed;
   left: 50%;
-  top: 14px;
-  transform: translateX(-50%);
+  bottom: 18px;
+  transform: translateX(-50%) translateY(0) scale(1);
   z-index: 80;
-  height: 64px;
+  height: 52px;
   display: none; /* enabled at md+ */
   align-items: flex-end;
-  gap: 14px;
-  padding: 10px 14px;
-  border-radius: 18px;
+  gap: 16px;
+  padding: 0 16px 10px;
+  border-radius: 16px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  transition: opacity 220ms ease, transform 220ms ease;
 }
 
 .floating-dock-desktop__link {
@@ -130,7 +131,7 @@ canvas {
 .floating-dock-desktop__tooltip {
   position: absolute;
   left: 50%;
-  top: calc(100% + 10px);
+  bottom: calc(100% + 10px);
   padding: 4px 8px;
   border-radius: 10px;
   font-size: 12px;
@@ -146,10 +147,12 @@ canvas {
 
 .floating-dock-mobile {
   position: fixed;
-  top: 14px;
-  right: 14px;
+  right: 18px;
+  bottom: 18px;
   z-index: 90;
   display: block;
+  transform: translateY(0) scale(1);
+  transition: opacity 220ms ease, transform 220ms ease;
 }
 
 .floating-dock-mobile__toggle {
@@ -180,7 +183,7 @@ canvas {
 
 .floating-dock-mobile__menu {
   position: absolute;
-  top: calc(100% + 10px);
+  bottom: calc(100% + 10px);
   right: 0;
   display: grid;
   gap: 10px;
@@ -192,6 +195,17 @@ canvas {
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.42);
   min-width: 160px;
+}
+
+.floating-dock--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.floating-dock-desktop.floating-dock--hidden {
+  transform: translateX(-50%) translateY(16px) scale(0.98);
+}
+.floating-dock-mobile.floating-dock--hidden {
+  transform: translateY(16px) scale(0.98);
 }
 
 .floating-dock-mobile__item {
@@ -279,6 +293,106 @@ canvas {
   width: 100%;
   padding: 90px 16px 24px;
   pointer-events: none; /* let model interaction pass through */
+}
+
+/* ---- Hero scroll indicator ---- */
+.hero-scroll {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  cursor: pointer;
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 35;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.92);
+  pointer-events: auto; /* landing-content is pointer-events:none */
+  animation: hero-scroll-float 1.8s ease-in-out infinite;
+}
+.hero-scroll:hover {
+  background: rgba(0, 0, 0, 0.30);
+  border-color: rgba(255, 255, 255, 0.20);
+  color: rgba(255, 255, 255, 1);
+}
+.hero-scroll:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+}
+
+.hero-scroll__mouse {
+  width: 20px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.60);
+  display: grid;
+  place-items: start center;
+  padding-top: 6px;
+}
+.hero-scroll__wheel {
+  width: 4px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  animation: hero-scroll-wheel 1.2s ease-in-out infinite;
+}
+
+.hero-scroll__chevron {
+  width: 16px;
+  height: 16px;
+  opacity: 0.9;
+}
+.hero-scroll__chevron svg {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-scroll__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+@keyframes hero-scroll-float {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-6px);
+  }
+}
+
+@keyframes hero-scroll-wheel {
+  0% {
+    opacity: 0.15;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.1;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll,
+  .hero-scroll__wheel {
+    animation: none !important;
+  }
 }
 
 /* ---- Hero text ---- */

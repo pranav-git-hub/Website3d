@@ -6,6 +6,28 @@ import { DarkstarCanvas } from './DarkstarCanvas';
 export function Landing() {
   const parallaxRootRef = useRef<HTMLDivElement | null>(null);
 
+  const scrollHalfScreen = () => {
+    const startY = window.scrollY || window.pageYOffset;
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const delta = window.innerHeight * 0.5;
+    const targetY = Math.min(maxY, startY + delta);
+    const durationMs = 1100; // slower than native smooth scroll
+
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / durationMs);
+      const eased = easeInOutCubic(t);
+      const nextY = startY + (targetY - startY) * eased;
+      window.scrollTo({ top: nextY });
+      if (t < 1) requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  };
+
   useEffect(() => {
     const base = import.meta.env.BASE_URL || '/';
 
@@ -50,13 +72,18 @@ export function Landing() {
 
       <div className="landing-content">
         <div className="hero">
-          <h1 className="hero-hi">Hello, I'm</h1>
+          <h1 className="hero-hi">Pranav Arvind Bhile</h1>
           <p className="hero-line">
-            Pranav Arvind Bhile
-            <br />
+          Worked with Fortune 500 teams
+          <br />
+          MIT-published researcher
+          <br />
+          B.E. in Computer Science, BITS Pilani
+          <br />
+            
           </p>
           <div className="hero-flip">
-            <span className="landing-flip" data-flip-words="AI/ML, GenAI" data-flip-duration="3000">
+            <span className="landing-flip" data-flip-words="ML / AI, Gen AI" data-flip-duration="3000">
               Secure
             </span>
           </div>
@@ -103,6 +130,26 @@ export function Landing() {
           </div>
         </div>
       </div>
+
+      <button
+        type="button"
+        className="hero-scroll"
+        onClick={scrollHalfScreen}
+        aria-label="Scroll down"
+      >
+        <span className="hero-scroll__mouse" aria-hidden="true">
+          <span className="hero-scroll__wheel" />
+        </span>
+        <span className="hero-scroll__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 16.5a1 1 0 0 1-.7-.29l-6-6a1 1 0 1 1 1.4-1.42L12 14.08l5.3-5.29a1 1 0 1 1 1.4 1.42l-6 6a1 1 0 0 1-.7.29Z"
+            />
+          </svg>
+        </span>
+        <span className="hero-scroll__label">Scroll</span>
+      </button>
     </section>
   );
 }

@@ -9,7 +9,7 @@ export function initFlipWords(root: ParentNode) {
     .filter(Boolean);
   if (words.length <= 1) return () => {};
 
-  const duration = Number(el.dataset.flipDuration ?? '3000') || 3000;
+  const duration = Number(el.dataset.flipDuration ?? '2000') || 2000;
   const exitMs = 520; // keep in sync with CSS animation durations
   const wordDelay = 300; // matches the framer-motion word stagger intent
   const letterDelay = 50;

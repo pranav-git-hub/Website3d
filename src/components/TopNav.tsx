@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { FloatingDock } from "./ui/floating-dock";
 
 function HomeIcon() {
@@ -23,12 +25,51 @@ function InfoIcon() {
 }
 
 export function TopNav() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const getThresholdY = () => {
+      const hero = document.getElementById("home");
+      if (!hero) return window.innerHeight * 0.25;
+
+      const rect = hero.getBoundingClientRect();
+      const heroTop = rect.top + (window.scrollY || window.pageYOffset);
+      const heroHeight = rect.height || window.innerHeight;
+      return heroTop + heroHeight * 0.25;
+    };
+
+    let thresholdY = getThresholdY();
+
+    const onResize = () => {
+      thresholdY = getThresholdY();
+      onScroll();
+    };
+
+    const onScroll = () => {
+      const y = window.scrollY || window.pageYOffset;
+      setVisible(y >= thresholdY);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+
+    // Initial state
+    onResize();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
   return (
     <FloatingDock
       items={[
         { title: "Home", icon: <HomeIcon />, href: "#home" },
         { title: "About", icon: <InfoIcon />, href: "#about" },
       ]}
+      desktopClassName={visible ? undefined : "floating-dock--hidden"}
+      mobileClassName={visible ? undefined : "floating-dock--hidden"}
     />
   );
 }
